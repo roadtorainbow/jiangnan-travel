@@ -1,1 +1,524 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>江南旅遊行程手冊</title>
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #3498db;
+            --accent-color: #e74c3c;
+            --bg-color: #f8f9fa;
+            --card-bg: #ffffff;
+            --text-color: #333333;
+            --border-color: #dee2e6;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Microsoft JhengHei", sans-serif;
+            font-size: 1.15rem; /* 符合內文至少 1.1rem~1.2rem */
+            line-height: 1.6;
+            color: var(--text-color);
+            background-color: var(--bg-color);
+            padding-bottom: 20px;
+        }
+
+        header {
+            background-color: var(--primary-color);
+            color: white;
+            text-align: center;
+            padding: 1.5rem 1rem;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        h1 {
+            font-size: 1.8rem; /* 符合標題至少 1.5rem~2rem */
+            margin-bottom: 0.3rem;
+        }
+
+        .subtitle {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+
+        /* 頁籤導覽列 */
+        nav {
+            display: flex;
+            overflow-x: auto;
+            background-color: #fff;
+            border-bottom: 2px solid var(--border-color);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            -webkit-overflow-scrolling: touch;
+        }
+
+        nav button {
+            flex: 0 0 auto;
+            padding: 1rem 1.2rem;
+            border: none;
+            background: none;
+            font-size: 1.2rem; /* 標題字級 */
+            font-weight: bold;
+            color: #555;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: all 0.2s ease;
+            border-bottom: 4px solid transparent;
+        }
+
+        nav button.active {
+            color: var(--secondary-color);
+            border-bottom-color: var(--secondary-color);
+            background-color: #f0f7fc;
+        }
+
+        /* 主要內容區 */
+        main {
+            max-width: 900px;
+            margin: 1.5rem auto;
+            padding: 0 1rem;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border-radius: 8px;
+            padding: 1.2rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            border: 1px solid var(--border-color);
+        }
+
+        h2 {
+            font-size: 1.6rem;
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--secondary-color);
+        }
+
+        h3 {
+            font-size: 1.35rem;
+            color: #2c3e50;
+            margin: 1rem 0 0.5rem 0;
+        }
+
+        /* 表格樣式 */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+            font-size: 1.15rem; /* 符合內文與表格字體至少 1.1rem~1.2rem */
+        }
+
+        th, td {
+            border: 1px solid var(--border-color);
+            padding: 0.8rem;
+            text-align: left;
+            vertical-align: top;
+        }
+
+        th {
+            background-color: #eef2f5;
+            color: var(--primary-color);
+            font-weight: bold;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+
+        /* 強調標籤與資訊區塊 */
+        .info-badge {
+            display: inline-block;
+            background-color: #e1f5fe;
+            color: #0288d1;
+            padding: 0.2rem 0.6rem;
+            border-radius: 4px;
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+
+        .alert-box {
+            background-color: #fff3cd;
+            border-left: 5px solid #ffc107;
+            padding: 1rem;
+            margin: 1rem 0;
+            border-radius: 4px;
+        }
+
+        .alert-box strong {
+            color: #856404;
+        }
+
+        /* 圖片容器 */
+        .img-container {
+            width: 100%;
+            margin: 1rem 0;
+            border-radius: 6px;
+            overflow: hidden;
+            background-color: #eaeded;
+            text-align: center;
+        }
+
+        .img-container img {
+            width: 100%;
+            max-width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        .img-fallback {
+            padding: 2rem 1rem;
+            color: #7f8c8d;
+            font-style: italic;
+            background-color: #eef2f3;
+            border: 1px dashed #bdc3c7;
+            border-radius: 6px;
+        }
+
+        ul, ol {
+            padding-left: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        li {
+            margin-bottom: 0.5rem;
+        }
+
+        .contact-number {
+            color: #d32f2f;
+            font-weight: bold;
+        }
+
+        @media (max-width: 600px) {
+            body {
+                font-size: 1.1rem;
+            }
+            th, td {
+                padding: 0.6rem;
+            }
+            nav button {
+                padding: 0.8rem 0.9rem;
+                font-size: 1.1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>「艾」上海江南雙古鎮精彩雙秀 5日</h1>
+        <div class="subtitle">東南旅遊團號：HDNAI5261016A</div>
+    </header>
+
+    <nav id="nav-bar">
+        <button onclick="switchTab('hotel')" id="tab-hotel">飯店資訊</button>
+        <button onclick="switchTab('flight')" id="tab-flight">航班資訊</button>
+        <button onclick="switchTab('notice')" id="tab-notice">參團須知</button>
+        <button onclick="switchTab('day1')" id="tab-day1">Day 1</button>
+        <button onclick="switchTab('day2')" id="tab-day2">Day 2</button>
+        <button onclick="switchTab('day3')" id="tab-day3">Day 3</button>
+        <button onclick="switchTab('day4')" id="tab-day4">Day 4</button>
+    </nav>
+
+    <main>
+        <!-- 飯店資訊 -->
+        <section id="content-hotel" class="tab-content">
+            <div class="card">
+                <h2>住宿飯店資訊（4晚住宿）</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th style="width: 25%;">日期 / 日程</th>
+                            <th style="width: 45%;">飯店名稱與地址</th>
+                            <th style="width: 30%;">電話 / 備註</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>第 1 天</strong><br>2026/10/16 (五)</td>
+                            <td>
+                                <strong>上海虹橋金沙 VOCO 酒店</strong><br>
+                                嘉定區江橋鎮金沙江西路 958 弄 1 號
+                            </td>
+                            <td>
+                                📞 <a href="tel:021-67088888" class="contact-number">021-67088888</a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><strong>第 2 天</strong><br>2026/10/17 (六)</td>
+                            <td>
+                                <strong>烏鎮枕水民宿</strong><br>
+                                烏鎮西柵景區女紅街 118 號
+                            </td>
+                            <td>
+                                📞 <a href="tel:0573-88731230" class="contact-number">0573-88731230</a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><strong>第 3 天</strong><br>2026/10/18 (日)</td>
+                            <td>
+                                <strong>杭州臨平溫德姆酒店</strong><br>
+                                餘杭區人民大道 505 號
+                            </td>
+                            <td>
+                                📞 <a href="tel:0571-86238888" class="contact-number">0571-86238888</a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><strong>第 4 天</strong><br>2026/10/19 (一)</td>
+                            <td>
+                                <strong>蘇州太湖蘇州灣艾美酒店</strong><br>
+                                吳江區太湖新城迎賓大道 518 號
+                            </td>
+                            <td>
+                                📞 <a href="tel:0512-87808888" class="contact-number">0512-87808888</a>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div class="alert-box">
+                    <strong>🚭 吸煙提醒：</strong>請勿在飯店場所指定之吸煙場所以外的地方吸煙；若是在禁煙客房內吸煙，飯店將要求入住旅客支付相關清潔費用。
+                </div>
+            </div>
+        </section>
+
+        <!-- 航班資訊 -->
+        <section id="content-flight" class="tab-content">
+            <div class="card">
+                <h2>航班與集合資訊</h2>
+                
+                <h3>📍 集合資訊</h3>
+                <table>
+                    <tbody>
+                        <tr>
+                            <th style="width: 30%;">集合時間</th>
+                            <td><strong>2026/10/16 (五) AM 10:15 集合</strong> <br><small style="color: #666;">(建議：搭機捷到桃園國際機場第二航廈，大約 9:30 到)</small></td>
+                        </tr>
+                        <tr>
+                            <th>集合地點</th>
+                            <td>桃園國際機場第二航廈 長榮航空 20 號櫃檯後方</td>
+                        </tr>
+                        <tr>
+                            <th>隨團人員</th>
+                            <td>陳湘縈 小姐（台灣手機：<a href="tel:0910996563" class="contact-number">0910-996-563</a>）</td>
+                        </tr>
+                        <tr>
+                            <th>送機人員</th>
+                            <td><a href="tel:0988236335" class="contact-number">0988-236-335</a> 或 <a href="tel:0905510768" class="contact-number">0905-510-768</a></td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h3>✈️ 往返航班明細</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>搭機日期</th>
+                            <th>行程航線</th>
+                            <th>班機號碼</th>
+                            <th>起飛時間</th>
+                            <th>抵達時間</th>
+                            <th>飛行時間</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>2026/10/16 (五)</td>
+                            <td>桃園 TPE ➔ 上海 PVG</td>
+                            <td>長榮航空 BR752</td>
+                            <td>12:45</td>
+                            <td>14:40</td>
+                            <td>01h 55m</td>
+                        </tr>
+                        <tr>
+                            <td>2026/10/20 (二)</td>
+                            <td>上海 PVG ➔ 桃園 TPE</td>
+                            <td>長榮航空 BR721</td>
+                            <td>20:05</td>
+                            <td>22:00</td>
+                            <td>01h 55m</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- 參團須知 -->
+        <section id="content-notice" class="tab-content">
+            <div class="card">
+                <h2>參團重要須知</h2>
+                <ol>
+                    <li><strong>集合與報到：</strong>隨團人員將於機場團體集合櫃檯前接待團員，辦理登機手續及行李託運後將護照發還給團員。證件自帶者，需提前 15 分鐘至機場集合。</li>
+                    <li><strong>證件檢查：</strong>團員領取護照後請檢查證件內之各種簽證是否齊全，若有不齊請通知隨團人員。請務必攜帶符合規定效期（2027/04/20 之後）之護照及相關簽證。役男請確認已完成役男線上申請短期出境核准。</li>
+                    <li><strong>服務費說明：</strong>本行程不包含導遊/隨團人員/司機服務費，旅客每人每日新台幣 300 元，共計 <strong>1,500 元</strong>。</li>
+                    <li><strong>行李托運規定：</strong>（國際段）可免費託運 1 件行李，重量以 <strong>23 公斤</strong>為限；超重或超件將依規定加收費用。</li>
+                    <li><strong>保險內容：</strong>旅行業責任險新台幣 500 萬元加 20 萬元意外醫療險（實支實付）；未滿 15 歲或 70 歲以上者，限投保旅行業責任險 250 萬元。建議旅客可自行加保旅遊平安險或旅遊綜合險。</li>
+                    <li><strong>個人必備物品：</strong>部分飯店不提供拖鞋、牙膏、牙刷，請務必自行準備！如有個人藥品亦請準備充分（國外買藥需外文處方箋）。</li>
+                    <li><strong>貴重物品與安全：</strong>貴重物品請勿放在大型行李箱內託運，請隨身攜帶。</li>
+                    <li><strong>機位劃位限制：</strong>團體機票無法累計里程、無法事先選位。以航空公司提供之部分座位為主，如有特殊需求請事先告知。</li>
+                </ol>
+            </div>
+        </section>
+
+        <!-- Day 1 -->
+        <section id="content-day1" class="tab-content">
+            <div class="card">
+                <h2>Day 1: 桃園 ➔ 上海</h2>
+                <p><strong>日期：</strong>2026/10/16 (星期五)</p>
+                <div class="img-container" id="img-box-day1">
+                    <img src="image/day1.jpg" alt="Day 1 行程" onerror="handleImageError(this, 'Day 1 行程圖片 (image/day1.jpg)')">
+                </div>
+                <table>
+                    <tr>
+                        <th style="width: 25%;">今日行程</th>
+                        <td>桃園國際機場集合搭機直飛上海，抵達後專車接送至飯店入住休息。</td>
+                    </tr>
+                    <tr>
+                        <th>住宿飯店</th>
+                        <td>上海虹橋金沙 VOCO 酒店</td>
+                    </tr>
+                </table>
+            </div>
+        </section>
+
+        <!-- Day 2 -->
+        <section id="content-day2" class="tab-content">
+            <div class="card">
+                <h2>Day 2: 上海 ➔ 烏鎮</h2>
+                <p><strong>日期：</strong>2026/10/17 (星期六)</p>
+                <div class="img-container" id="img-box-day2">
+                    <img src="image/day2.jpg" alt="Day 2 行程" onerror="handleImageError(this, 'Day 2 行程圖片 (image/day2.jpg)')">
+                </div>
+                <table>
+                    <tr>
+                        <th style="width: 25%;">今日行程</th>
+                        <td>前往千年水鄉烏鎮，遊覽西柵景區，感受江南古鎮夜色與水鄉風情。</td>
+                    </tr>
+                    <tr>
+                        <th>住宿飯店</th>
+                        <td>烏鎮枕水民宿（烏鎮西柵景區內）</td>
+                    </tr>
+                </table>
+            </div>
+        </section>
+
+        <!-- Day 3 -->
+        <section id="content-day3" class="tab-content">
+            <div class="card">
+                <h2>Day 3: 烏鎮 ➔ 杭州</h2>
+                <p><strong>日期：</strong>2026/10/18 (星期日)</p>
+                <div class="img-container" id="img-box-day3">
+                    <img src="image/day3.jpg" alt="Day 3 行程" onerror="handleImageError(this, 'Day 3 行程圖片 (image/day3.jpg)')">
+                </div>
+                <table>
+                    <tr>
+                        <th style="width: 25%;">今日行程</th>
+                        <td>前往杭州，欣賞經典雙秀與杭州名勝景點。</td>
+                    </tr>
+                    <tr>
+                        <th>住宿飯店</th>
+                        <td>杭州臨平溫德姆酒店</td>
+                    </tr>
+                </table>
+            </div>
+        </section>
+
+        <!-- Day 4 -->
+        <section id="content-day4" class="tab-content">
+            <div class="card">
+                <h2>Day 4: 杭州 ➔ 蘇州</h2>
+                <p><strong>日期：</strong>2026/10/19 (星期一)</p>
+                <div class="img-container" id="img-box-day4">
+                    <img src="image/day4.jpg" alt="Day 4 行程" onerror="handleImageError(this, 'Day 4 行程圖片 (image/day4.jpg)')">
+                </div>
+                <table>
+                    <tr>
+                        <th style="width: 25%;">今日行程</th>
+                        <td>前往蘇州，體驗園林之美與太湖湖畔夜景。</td>
+                    </tr>
+                    <tr>
+                        <th>住宿飯店</th>
+                        <td>蘇州太湖蘇州灣艾美酒店</td>
+                    </tr>
+                </table>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        // 頁籤切換與 localStorage 記憶
+        function switchTab(tabName) {
+            // 隱藏所有分頁
+            const contents = document.querySelectorAll('.tab-content');
+            contents.forEach(content => content.classList.remove('active'));
+
+            // 移除所有按鈕 active 樣式
+            const buttons = document.querySelectorAll('nav button');
+            buttons.forEach(button => button.classList.remove('active'));
+
+            // 顯示當前分頁
+            const targetContent = document.getElementById('content-' + tabName);
+            const targetButton = document.getElementById('tab-' + tabName);
+
+            if (targetContent && targetButton) {
+                targetContent.classList.add('active');
+                targetButton.classList.add('active');
+
+                // 寫入 localStorage (含 Error Handling 防護)
+                try {
+                    localStorage.setItem('jiangnan_last_tab', tabName);
+                } catch (e) {
+                    console.warn('localStorage 寫入失敗 (可能處於私密瀏覽或存取被受限模式):', e);
+                }
+            }
+        }
+
+        // 載入備援機制 (Fallback & 讀取記憶)
+        function initApp() {
+            let defaultTab = 'hotel'; // 預設初始頁籤
+            
+            try {
+                const savedTab = localStorage.getItem('jiangnan_last_tab');
+                if (savedTab && document.getElementById('content-' + savedTab)) {
+                    defaultTab = savedTab;
+                }
+            } catch (e) {
+                console.warn('localStorage 讀取失敗，使用預設分頁:', e);
+            }
+
+            switchTab(defaultTab);
+        }
+
+        // 圖片載入失敗時的 Fallback 處理
+        function handleImageError(imgElement, labelText) {
+            const container = imgElement.parentElement;
+            const fallbackDiv = document.createElement('div');
+            fallbackDiv.className = 'img-fallback';
+            fallbackDiv.innerHTML = '📷 暫無圖片或圖片載入失敗<br><small>(' + labelText + ')</small>';
+            container.replaceChild(fallbackDiv, imgElement);
+        }
+
+        // 頁面載入完成後執行初始化
+        document.addEventListener('DOMContentLoaded', initApp);
+    </script>
+</body>
+</html>
 
